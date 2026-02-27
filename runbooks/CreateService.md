@@ -2,7 +2,7 @@
 
 This runbook creates GitHub repos for a domain from the architecture specification: for each repo in that domain with `type: api` or `type: spa` (skipping `type: spa_ref`), it creates the repo from its template, runs template merge processing, builds/pushes the container when applicable, and pushes the result.
 
-**SERVICE_NAME:** The runbook clones the {{org.git_host}}/{{org.git_org}}/{{info.slug}} repo to get design specifications. `Specifications/architecture.yaml` and `Specifications/product.yaml` are used. `SERVICE_NAME` is a domain name (or comma-delimited list of domain names) that maps to section(s) of architecture.yaml. Repos within that domain with `type: api` or `type: spa` are processed; `type: spa_ref` repos are skipped. Created repo names are prefixed with `info.slug` from product.yaml (e.g. `{{info.slug}}_mongodb_api`). Repos with an optional `publish` attribute run build/publish: `make build-publish` when `publish: make`, `npm run build-publish` when `publish: npm`, or `pipenv run build-publish` when `publish: pipenv`; repos without `publish` (e.g. libraries) are created and merged but not built or pushed. Organization and registry for git and registry login are read from `Specifications/product.yaml`.
+**SERVICE_NAME:** The runbook clones the https://github.com/agile-learning-institute/mentorhub repo to get design specifications. `Specifications/architecture.yaml` and `Specifications/product.yaml` are used. `SERVICE_NAME` is a domain name (or comma-delimited list of domain names) that maps to section(s) of architecture.yaml. Repos within that domain with `type: api` or `type: spa` are processed; `type: spa_ref` repos are skipped. Created repo names are prefixed with `info.slug` from product.yaml (e.g. `mentorhub_mongodb_api`). Repos with an optional `publish` attribute run build/publish: `make build-publish` when `publish: make`, `npm run build-publish` when `publish: npm`, or `pipenv run build-publish` when `publish: pipenv`; repos without `publish` (e.g. libraries) are created and merged but not built or pushed. Organization and registry for git and registry login are read from `Specifications/product.yaml`.
 
 # Environment Requirements
 ```yaml
@@ -29,13 +29,13 @@ set -e
 INITIAL_DIR=$(pwd)
 REPO_HOST="${RUNBOOK_EXEC_DIR_HOST}"
 MERGE_IMAGE="ghcr.io/agile-learning-institute/stage0_runbook_merge:latest"
-# --- Clone {{info.slug}} and resolve specs path ---
-echo "Cloning {{info.slug}} for Specifications..."
-git clone "https://${GITHUB_TOKEN}@github.com/{{org.git_org}}/{{info.slug}}.git" {{info.slug}} || { echo "Failed to clone {{info.slug}}"; exit 1; }
-SPECS_DIR="$INITIAL_DIR/{{info.slug}}/Specifications"
+# --- Clone mentorhub and resolve specs path ---
+echo "Cloning mentorhub for Specifications..."
+git clone "https://${GITHUB_TOKEN}@github.com/agile-learning-institute/mentorhub.git" mentorhub || { echo "Failed to clone mentorhub"; exit 1; }
+SPECS_DIR="$INITIAL_DIR/mentorhub/Specifications"
 ARCH_FILE="$SPECS_DIR/architecture.yaml"
 PRODUCT_FILE="$SPECS_DIR/product.yaml"
-SPECS_HOST="$REPO_HOST/{{info.slug}}/Specifications"
+SPECS_HOST="$REPO_HOST/mentorhub/Specifications"
 
 [[ -f "$ARCH_FILE" ]] || { echo "Error: Architecture file not found: $ARCH_FILE" >&2; exit 1; }
 [[ -f "$PRODUCT_FILE" ]] || { echo "Error: Product file not found: $PRODUCT_FILE" >&2; exit 1; }
